@@ -89,3 +89,13 @@
 
 })(jQuery);
 
+
+// Range
+(function($) {
+	$(document).ready(function() {
+		$('.killerapps-settings-range').on('change', function(e) {
+			$(e.target).siblings('.killerapps-settings-range-value').html(e.target.value);
+		})
+	});
+})(jQuery);
+

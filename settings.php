@@ -168,7 +168,34 @@ class KillerappsCreateSettingsField {
 				<?php
 				break;
 			default:
+				$more = '';
+				switch ($this->type) {
+					case 'number':
+						if ($this->options && $this->options['step']) {
+							$more .= ' step="' . $this->options['step'] . '"';
+						}
+						break;
+					case 'range':
+						if ($this->options['step'])
+							$more .= ' step="' . $this->options['step'] . '"';
+						if ($this->options['max'])
+							$more .= " max={$this->options['max']}";
+						if ($this->options['min'])
+							$more .= " min={$this->options['min']}";
+						$more .= ' data-wtf';
+						break;
+				}
+				if ($this->options['min'] || $this->options['min'] == 0)
+					echo "<span class='killerapps-settings-range-min'>{$this->options['min']}</span>";
 				echo "<input type='{$this->type}' id='{$this->id}' name='{$this->option_name}[{$this->id}]' value='{$value}' class='killerapps-settings-{$this->type}' {$more} />";
+				if ($this->options['max'])
+					echo "<span class='killerapps-settings-range-max'>{$this->options['max']}</span>";
+				if ($this->type == "range") {
+					echo "<span class='killerapps-settings-range-value'>{$value}</span>";
+				}
+				if ($this->type == "url") {
+					echo " <a href='{$value}'>click</a>";
+				}
 		}
 		echo "</p>";
 	}
@@ -176,6 +203,10 @@ class KillerappsCreateSettingsField {
 	function sanitize($value) {
 		$value = sanitize_text_field($value);
 		switch ($this->type) {
+			case 'number':
+			case 'range':
+				return filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+				break;
 			case 'image':
 				$value = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
 				if (wp_get_attachment_image( $value ) ) {
