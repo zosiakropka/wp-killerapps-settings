@@ -1,4 +1,4 @@
-wp-killerapps-settings
-======================
+Killerapps Settings
+===================
 
 WordPress plugin for custom settings pages
