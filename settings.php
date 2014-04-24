@@ -155,7 +155,18 @@ class KillerappsCreateSettingsField {
 		if ($this->description) {echo "<p class='setting-field-description'>" . $this->description . "</p>";}
 		echo "<p class='setting-field setting-field-{$this->type}'>";
 		switch ($this->type) {
-
+			case "image":
+				?>
+				<div class="image-setting">
+					<?php echo "<input type='hidden' id='{$this->id}' name='{$this->option_name}[{$this->id}]' value='{$value}'/>"; ?>
+					<input type="button" value="Select Image" class="killerapps-settings-image-select button"/>
+					<span class="killerapps-settings-image-container"><?php echo wp_get_attachment_image($value) ?></span>
+					<br/><br/>
+					<input type="button" value="Detach" class="killerapps-settings-image-detach button <?php if(!$value) {echo "hidden";} ?>"/>
+				</div>
+				<div class="clear"></div>
+				<?php
+				break;
 			default:
 				echo "<input type='{$this->type}' id='{$this->id}' name='{$this->option_name}[{$this->id}]' value='{$value}' class='killerapps-settings-{$this->type}' {$more} />";
 		}
@@ -165,6 +176,14 @@ class KillerappsCreateSettingsField {
 	function sanitize($value) {
 		$value = sanitize_text_field($value);
 		switch ($this->type) {
+			case 'image':
+				$value = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
+				if (wp_get_attachment_image( $value ) ) {
+					return $value;
+				} else {
+					return '';
+				}
+				break;
 
 			default:
 				return filter_var($value, FILTER_SANITIZE_STRIPPED);
