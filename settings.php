@@ -207,6 +207,35 @@ class KillerappsCreateSettingsField {
 			case 'range':
 				return filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
 				break;
+
+			case 'url':
+				return filter_var($value, FILTER_SANITIZE_URL);
+				break;
+
+			case 'email':
+				return filter_var($value, FILTER_SANITIZE_EMAIL);
+				break;
+
+			case 'date':
+				$date = filter_var($value, FILTER_SANITIZE_STRIPPED);
+				if (preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/i', $date)) {
+					return $date;
+				} else {
+					return '';
+				}
+				break;
+
+			case 'color':
+				$color = filter_var($value, FILTER_SANITIZE_STRIPPED);
+				if (preg_match('/^#[a-f0-9]{6}$/i', $color)) {
+					return $color;
+				} else if (preg_match('/^[a-f0-9]{6}$/i', $color)) {
+					return '#' . $color;
+				} else {
+					return '';
+				}
+				break;
+
 			case 'image':
 				$value = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
 				if (wp_get_attachment_image( $value ) ) {
