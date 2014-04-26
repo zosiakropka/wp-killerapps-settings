@@ -146,8 +146,8 @@ class KillerappsCreateSettingsField {
 
 	function callback() {
 
-		$options = get_option( $this->option_name );
-		$value = $options[$this->id];
+		$current_option = get_option( $this->option_name );
+		$value = $current_option[$this->id];
 		if ( $value === NULL && $this->default) {
     		update_option( $this->id, $this->default );
 			$value = $this->default;
@@ -155,8 +155,7 @@ class KillerappsCreateSettingsField {
 		if ($this->description) {echo "<p class='setting-field-description'>" . $this->description . "</p>";}
 		echo "<p class='setting-field setting-field-{$this->type}'>";
 		switch ($this->type) {
-			case "image":
-				?>
+			case "image": ?>
 				<div class="image-setting">
 					<?php echo "<input type='hidden' id='{$this->id}' name='{$this->option_name}[{$this->id}]' value='{$value}'/>"; ?>
 					<input type="button" value="Select Image" class="killerapps-settings-image-select button"/>
@@ -167,15 +166,36 @@ class KillerappsCreateSettingsField {
 				<div class="clear"></div>
 				<?php
 				break;
+			case "checkbox_list":
+				echo "checkbox list not implemented";
+				break;
+			case "posts":
 			case "radio": ?>
 				<ul>
 				<?php
-				$type = $this->type;
-				if ($this->type == "checkbox_list") {
+				if ($this->type == 'posts') {
+					$options = array();
+					$post_query = new WP_Query($this->options['query_args']);
+					while ($post_query->have_posts()) {
+						$post_query->the_post();
+						$label = get_the_title();
+						if ($this->options['link']) {
+							$permalink = get_permalink();
+							$label = "<a href='{$permalink}'>{$label}</a>";
+						}
+						$options[get_the_ID()] = $label;
+					}
+					$type = $this->options['type'];
+				} else {
+					$options = $this->options['options'];
+					$type = $this->type;
+				}
+				if ($type == "checkbox_list") {
 					$type = "checkbox";
 				}
 				$name = "{$this->option_name}[{$this->id}]";
-				foreach ($this->options['options'] as $option_value => $option_label) {
+
+				foreach ($options as $option_value => $option_label) {
 					$id = "{$name}[{$option_value}]";
 					if ($type == "radio" && $value == $option_value) {
 						$checked = "checked";
@@ -201,7 +221,6 @@ class KillerappsCreateSettingsField {
 							$more .= " max={$this->options['max']}";
 						if ($this->options['min'])
 							$more .= " min={$this->options['min']}";
-						$more .= ' data-wtf';
 						break;
 				}
 				if ($this->options['min'] || $this->options['min'] == 0)
