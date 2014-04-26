@@ -167,6 +167,25 @@ class KillerappsCreateSettingsField {
 				<div class="clear"></div>
 				<?php
 				break;
+			case "radio": ?>
+				<ul>
+				<?php
+				$type = $this->type;
+				if ($this->type == "checkbox_list") {
+					$type = "checkbox";
+				}
+				$name = "{$this->option_name}[{$this->id}]";
+				foreach ($this->options['options'] as $option_value => $option_label) {
+					$id = "{$name}[{$option_value}]";
+					if ($type == "radio" && $value == $option_value) {
+						$checked = "checked";
+					} else {
+						$checked = '';
+					}
+					echo "<li><input type='{$type}' name='{$name}' id='{$id}' value='{$option_value}' {$checked}/><label for='{$id}'>{$option_label}</label></li>";
+				}
+				?></ul><?php
+				break;
 			default:
 				$more = '';
 				switch ($this->type) {
