@@ -8,6 +8,7 @@
  * Author URI: http://www.killeapps.pl
  * License: GPLv2 or later
  */
+
 class KillerappsCreateSettingsPage {
 
   private $title;
@@ -18,7 +19,6 @@ class KillerappsCreateSettingsPage {
   private $fields;
 
   public function KillerappsCreateSettingsPage($title, $group, $option_name, $sections, $capability) {
-
     $this->title = $title;
     $this->group = $group;
     $this->option_name = $option_name;
@@ -206,6 +206,12 @@ class KillerappsCreateSettingsField {
           }
           ?></ul><?php
           break;
+        case "editor":
+			wp_editor(html_entity_decode(stripcslashes($value)), "{$this->option_name}[{$this->id}]");
+            break;
+        case "textarea":
+			echo "<textarea id='{$this->id}' name='{$this->option_name}[{$this->id}]' class='killerapps-settings-{$this->type}'>{$value}</textarea>";
+          break;
         default:
           $more_data = '';
           switch ($this->type) {
@@ -239,53 +245,7 @@ class KillerappsCreateSettingsField {
     }
 
     function sanitize($value) {
-      $value = sanitize_text_field($value);
-      switch ($this->type) {
-        case 'number':
-        case 'range':
-          return filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-          break;
-
-        case 'url':
-          return filter_var($value, FILTER_SANITIZE_URL);
-          break;
-
-        case 'email':
-          return filter_var($value, FILTER_SANITIZE_EMAIL);
-          break;
-
-        case 'date':
-          $date = filter_var($value, FILTER_SANITIZE_STRIPPED);
-          if (preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/i', $date)) {
-            return $date;
-          } else {
-            return '';
-          }
-          break;
-
-        case 'color':
-          $color = filter_var($value, FILTER_SANITIZE_STRIPPED);
-          if (preg_match('/^#[a-f0-9]{6}$/i', $color)) {
-            return $color;
-          } else if (preg_match('/^[a-f0-9]{6}$/i', $color)) {
-            return '#' . $color;
-          } else {
-            return '';
-          }
-          break;
-
-        case 'image':
-          $value = filter_var($value, FILTER_SANITIZE_NUMBER_INT);
-          if (wp_get_attachment_image($value)) {
-            return $value;
-          } else {
-            return '';
-          }
-          break;
-
-        default:
-          return filter_var($value, FILTER_SANITIZE_STRIPPED);
-      }
+    	return killerapps_sanitize($value, $this->type);
     }
 
   }
@@ -305,6 +265,13 @@ class KillerappsCreateSettingsField {
     add_action('admin_enqueue_scripts', 'killerapps_settings_admin_enqueue');
   }
   add_action('plugins_loaded', 'killerapps_settings_init');
-
-
-  
+  if (isset($_POST['option_page'])) {
+  	foreach ($_POST as $key => $options) {
+      if ($key[0] != "_" && !in_array($key, array("option_page", "action", "submit"))) {
+      	foreach ($options as $option => $value) {
+      		$value = strip_tags($value, "<strong><em><p><ul><ol><li><a><img><quote><code><pre><address>");
+			$_POST[$key][$option] = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+		}
+      }
+    }
+  }
