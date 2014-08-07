@@ -171,10 +171,11 @@ class KillerappsCreateSettingsField {
       case "posts":
       case "radio":
         ?>
-        <ul>
+        <ul class="killerapps-radio-list">
           <?php
           if ($this->type == 'posts') {
-            $options = array();
+          	$this->type = 'radio';
+          	$options = array();
             $post_query = new WP_Query($this->options['query_args']);
             while ($post_query->have_posts()) {
               $post_query->the_post();
@@ -185,9 +186,9 @@ class KillerappsCreateSettingsField {
               }
               $options[get_the_ID()] = $label;
             }
-            $type = $this->options['type'];
+            $type = $this->type;
           } else {
-            $options = $this->options['options'];
+            $options = $this->options;
             $type = $this->type;
           }
           if ($type == "checkbox_list") {
@@ -269,7 +270,7 @@ class KillerappsCreateSettingsField {
   	foreach ($_POST as $key => $options) {
       if ($key[0] != "_" && !in_array($key, array("option_page", "action", "submit"))) {
       	foreach ($options as $option => $value) {
-      		$value = strip_tags($value, "<strong><em><p><ul><ol><li><a><img><quote><code><pre><address>");
+      		$value = strip_tags($value, "<strong><em><p><ul><ol><li><a><img><quote><code><pre><address><h1><h2><h3><h4><table><thead><tbody><tr><td><tfoot><caption>");
 			$_POST[$key][$option] = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
 		}
       }
