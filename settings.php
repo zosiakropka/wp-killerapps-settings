@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: Killerapps Settings
  * Description:  Custom settings pages for WordPress
@@ -208,7 +207,7 @@ class KillerappsCreateSettingsField {
           ?></ul><?php
           break;
         case "editor":
-			wp_editor(html_entity_decode(stripcslashes($value)), "{$this->option_name}[{$this->id}]");
+			wp_editor(html_entity_decode(stripcslashes($value)), preg_replace("/[^a-zA-Z0-9]+/", "", "{$this->option_name}[{$this->id}]"), array("textarea_name"=>"{$this->option_name}[{$this->id}]"));
             break;
         case "textarea":
 			echo "<textarea id='{$this->id}' name='{$this->option_name}[{$this->id}]' class='killerapps-settings-{$this->type}'>{$value}</textarea>";
